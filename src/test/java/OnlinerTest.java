@@ -1,12 +1,17 @@
 import driver.Browser;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.LoginForm;
 import pages.OnlinerMainPage;
+import pages.PopularSections;
+import pages.SectionPage;
 
 import java.util.concurrent.TimeUnit;
 
 public class OnlinerTest {
+    private String configPath = "./config.json";
 
     @BeforeMethod
     public void setUp() {
@@ -17,11 +22,18 @@ public class OnlinerTest {
 
     @Test
     public void onlinerTest() {
-
+        WebDriverWait wait = new WebDriverWait(Browser.getDriver(), 10);
         OnlinerMainPage onlinerMainPage = new OnlinerMainPage();
-        onlinerMainPage.clickLogIn();
 
-        LoginForm loginForm = new LoginForm();
-        loginForm.login();
+        onlinerMainPage.clickLogIn();
+        new LoginForm().login(configPath, wait);
+
+        String sectionName = PopularSections.goToRandomSection(wait);
+        Assert.assertEquals(new SectionPage().getSectionTitleText(), sectionName);
+
+        Browser.getDriver().navigate().back();
+
+        onlinerMainPage.clickLogOut();
     }
+
 }
